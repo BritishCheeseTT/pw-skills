@@ -51,9 +51,9 @@ cp /path/to/Image-Generation/config.example/.gitignore ./.gitignore
 ### Step 4: 创建提示词
 
 ```bash
-mkdir -p output/prompts
-cp /path/to/Image-Generation/config.example/prompt-templates/提示词模板.md ./output/prompts/我的提示词.md
-vim ./output/prompts/我的提示词.md
+mkdir -p article-images/prompts
+cp /path/to/Image-Generation/config.example/prompt-templates/提示词模板.md ./article-images/prompts/我的提示词.md
+vim ./article-images/prompts/我的提示词.md
 ```
 
 参考 `config.example/style-library.md` 选择合适的风格。
@@ -76,7 +76,7 @@ node /path/to/Image-Generation/scripts/generate-image.js
 my-image-project/
 ├── config/
 │   └── secrets.md           # API 配置（可选）
-├── output/
+├── article-images/
 │   ├── analysis/            # 风格分析（可选）
 │   ├── prompts/             # 提示词文件
 │   ├── references/          # 参考图像

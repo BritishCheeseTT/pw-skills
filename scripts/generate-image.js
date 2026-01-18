@@ -128,6 +128,13 @@ async function generateImage(prompt, referenceImagePath, config) {
 
   const data = await response.json();
 
+  // 调试：打印响应数据
+  console.log('  API 响应状态:', response.status);
+  if (!response.ok) {
+    console.log('  错误响应:', JSON.stringify(data, null, 2).substring(0, 500));
+    throw new Error(`API 请求失败: ${response.status}`);
+  }
+
   // 提取图像数据
   if (data.candidates && data.candidates.length > 0) {
     const parts = data.candidates[0].content?.parts || [];
@@ -138,6 +145,8 @@ async function generateImage(prompt, referenceImagePath, config) {
     }
   }
 
+  // 调试：打印响应结构
+  console.log('  响应结构:', JSON.stringify(data, null, 2).substring(0, 500));
   throw new Error('无法获取图像数据');
 }
 
@@ -182,7 +191,7 @@ function readPromptFiles(outputDir) {
 
 // 主函数
 async function main() {
-  const outputDir = process.argv[2] || path.join(process.cwd(), 'output');
+  const outputDir = process.argv[2] || path.join(process.cwd(), 'article-images');
 
   if (!fs.existsSync(outputDir)) {
     console.warn('警告: 输出目录不存在，将创建:', outputDir);
