@@ -1,215 +1,120 @@
-# ast-grep Skill for Claude Code
+# Claude Code Skills
 
-A Claude Code skill that enables powerful structural code search using Abstract Syntax Tree (AST) patterns. Search your codebase based on code structure rather than just text matching.
+这是一个 Claude Code Skills 仓库，包含多个实用的技能扩展。
 
-## What is This?
+## 技能列表
 
-Agent Skills are modular capabilities that extend Claude’s functionality. Each Skill packages instructions, metadata, and optional resources (scripts, templates) that Claude uses automatically when relevant.
+### pw-image-generation
 
-ast-grep skill teaches Claude how to write and use ast-grep rules to perform advanced code searches. Unlike traditional text-based search (grep, ripgrep), ast-grep understands the structure of your code, allowing you to find patterns like:
+AI 图像生成工作流，支持文生图、图生图、批量生成。
 
-- "Find all async functions that don't have error handling"
-- "Locate all React components that use a specific hook"
-- "Find functions with more than 3 parameters"
-- "Search for console.log calls inside class methods"
+**特性**：
+- 文生图和图生图
+- 批量生成（逐张确认，避免额度浪费）
+- 9 种预设风格（水彩/扁平化/3D/油画/赛博朋克/像素/手绘/写实/抽象）
+- 工具脚本：合并长图、打包 PPT
 
+**安装**：
+```bash
+cd ~/.claude/skills/pw-image-generation && npm install
+```
 
+**使用**：查看 [pw-image-generation/SKILL.md](./pw-image-generation/SKILL.md)
 
+---
 
-## Prerequisites
+### pw-redbook-image
 
-You need to have ast-grep installed on your system:
+小红书风格提示词模板，配合 pw-image-generation 使用。
+
+**特性**：
+- 文章拆解为系列图
+- 封面图、内容图、结尾图模板
+- 小红书风格约束（竖版、卡通手绘、莫兰迪色系）
+
+**依赖**：需要先安装 pw-image-generation
+
+**使用**：查看 [pw-redbook-image/SKILL.md](./pw-redbook-image/SKILL.md)
+
+---
+
+### 其他技能
+
+- **ast-grep**: 基于 AST 的代码结构搜索
+- **dev-principles**: 渐进式开发指导原则
+- **frontend-design**: 前端 UI/UX 设计
+- **research-workflow**: 调研和任务执行策略
+- **AIPPT-Enterprise**: 基于模板定制化生成 PPT
+
+## 快速开始
+
+### 1. 克隆仓库
 
 ```bash
-# macOS
-brew install ast-grep
-
-# npm
-npm install -g @ast-grep/cli
-
-# cargo
-cargo install ast-grep
+git clone <repository-url> ~/.claude/skills
 ```
 
-Verify installation:
-```bash
-ast-grep --version
-```
-
-## Installation
-
-1. Clone or download this repository to your Claude Code skills directory:
+### 2. 安装依赖（如需要）
 
 ```bash
-# If you have a skills directory configured
-cp -r ast-grep ~/.claude/skills/
+# 安装 pw-image-generation 依赖
+cd ~/.claude/skills/pw-image-generation && npm install
 
-# Or place it wherever your Claude Code skills are located
+# 安装 AIPPT-Enterprise 依赖（如需要）
+cd ~/.claude/skills/AIPPT-Enterprise && npm install
 ```
 
-2. The skill should be automatically detected by Claude Code. You can verify by checking available skills in Claude Code.
+### 3. 使用技能
 
-3. You will need to ask Claude to use this skill explicitly in your queries, like "Use ast-grep to find...". Claude code, as of Nov 2025, cannot pick up ast-grep for proper use cases automatically.
+在 Claude Code 中，技能会自动加载。使用 `/skill-name` 调用特定技能。
 
-## How to Use
+## 让 AI 帮你安装
 
-Once installed, simply ask Claude to search your code using structural patterns. Claude will automatically use this skill when appropriate.
+你可以让 Claude 帮助你安装和配置技能：
 
-### Example Queries
-
-**Find async functions with await:**
 ```
-Find all async functions in this project that use await
-```
+请帮我安装 pw-image-generation skill：
 
-**Find missing error handling:**
-```
-Show me async functions that don't have try-catch blocks
+1. 进入 skill 目录并安装依赖
+2. 配置 ai-router 的 API Key：[你的 API Key]
+3. 创建测试项目并生成一张测试图片
+
+注意：API Key 是 ai-router 的密钥，支持多种模型。
 ```
 
-**Find specific function calls:**
+## 目录结构
+
 ```
-Find all places where we call console.log with more than one argument
-```
-
-**Find code in specific contexts:**
-```
-Find all setState calls inside useEffect hooks
-```
-
-### How It Works
-
-When you ask Claude to search for code patterns:
-
-1. Claude analyzes your query and determines if ast-grep is appropriate
-2. It creates example code that matches your search criteria
-3. It writes an ast-grep rule to match the pattern
-4. It tests the rule against the example code
-5. Once verified, it searches your entire codebase
-6. Results are presented with file paths and line numbers
-
-## Supported Languages
-
-ast-grep supports many programming languages including:
-
-- JavaScript/TypeScript
-- Python
-- Rust
-- Go
-- Java
-- C/C++
-- Ruby
-- PHP
-- And many more
-
-## Key Features
-
-- **Structure-aware search**: Matches code based on AST structure, not just text
-- **Metavariables**: Use `$VAR` to match any expression, statement, or identifier
-- **Relational queries**: Find code inside specific contexts (e.g., "find X inside Y")
-- **Composite logic**: Combine rules with AND, OR, NOT operations
-- **Test-driven approach**: Rules are tested before running on your codebase
-
-## Advanced Usage
-
-### Direct ast-grep Commands
-
-While Claude will handle most use cases automatically, you can also use ast-grep directly:
-
-```bash
-# Simple pattern search
-ast-grep run --pattern 'console.log($ARG)' --lang javascript .
-
-# Complex rule-based search
-ast-grep scan --inline-rules "id: my-rule
-language: javascript
-rule:
-  kind: function_declaration
-  has:
-    pattern: await \$EXPR
-    stopBy: end" .
+~/.claude/skills/
+├── README.md                    # 本文件
+├── task.md                      # 任务记录
+├── pw-image-generation/         # AI 图像生成
+│   ├── SKILL.md
+│   ├── references/
+│   ├── scripts/
+│   └── package.json
+├── pw-redbook-image/            # 小红书图片生成
+│   ├── SKILL.md
+│   └── references/
+├── AIPPT-Enterprise/            # PPT 生成
+├── ast-grep/                    # AST 代码搜索
+├── dev-principles/              # 开发原则
+├── frontend-design/             # 前端设计
+└── research-workflow/           # 调研工作流
 ```
 
-### Debugging
+## 贡献
 
-If a search isn't working as expected, ask Claude to:
-- Show you the ast-grep rule it created
-- Inspect the AST structure of your code
-- Test the rule against example code
+欢迎提交 Issue 和 Pull Request。
 
-## Files in This Skill
+## 作者
 
-- `SKILL.md` - Main skill instructions for Claude
-- `references/rule_reference.md` - Comprehensive ast-grep rule documentation
-- `README.md` - This file
+牟勇
 
-## Tips for Best Results
+官网: https://ai-router.plugins-world.cn
 
-1. **Be specific**: The more details you provide, the better the search results
-2. **Provide examples**: If possible, show Claude an example of what you want to find
-3. **Iterate**: Start with a broad search and narrow it down
-4. **Ask for explanations**: Ask Claude to explain the ast-grep rule it creates
+微信: 1254074921 (添加请注明来意)
 
-## Examples of What You Can Search For
+## 许可证
 
-### Code Quality
-- Functions without return statements
-- Functions with too many parameters
-- Unused variables
-- Missing null checks
-
-### Patterns
-- React hooks usage patterns
-- API call patterns
-- Database query patterns
-- Error handling patterns
-
-### Refactoring
-- Find all uses of deprecated functions
-- Locate code that needs migration
-- Find inconsistent patterns across codebase
-
-### Security
-- Potential SQL injection points
-- Unsafe eval usage
-- Missing input validation
-
-## Troubleshooting
-
-**Claude isn't using the skill:**
-- Make sure ast-grep is installed (`ast-grep --version`)
-- Try being more explicit: "Use ast-grep to search for..."
-
-**No results found:**
-- Try a simpler query first
-- Ask Claude to show you the rule and test it
-- Provide an example of code you want to match
-
-**Unexpected results:**
-- Refine your query with more details
-- Ask Claude to exclude certain patterns
-- Request to see the AST structure of your code
-
-## Contributing
-
-To improve this skill:
-1. Edit `SKILL.md` to update Claude's instructions
-2. Add examples to `references/` directory
-3. Test with various code patterns
-
-## Resources
-
-- [ast-grep Official Documentation](https://ast-grep.github.io/)
-- [ast-grep Playground](https://ast-grep.github.io/playground.html) - Test patterns online
-- [ast-grep GitHub](https://github.com/ast-grep/ast-grep)
-
-## License
-
-This skill follows ast-grep's MIT license for any included documentation or examples.
-
-## Support
-
-For issues with:
-- **This skill**: Open an issue in this repository
-- **ast-grep itself**: Visit [ast-grep GitHub](https://github.com/ast-grep/ast-grep)
-- **Claude Code**: Check [Claude Code documentation](https://code.claude.com/)
+MIT License
