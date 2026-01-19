@@ -21,12 +21,23 @@ cd ~/.claude/skills/pw-image-generation && npm install
 
 ## 让 AI 帮你安装
 
+你可以让 Claude 帮助你安装和配置技能：
+
 ```
 请帮我安装 pw-image-generation skill：
+
 1. 进入 skill 目录并安装依赖
 2. 配置 ai-router 的 API Key：[你的 API Key]
 3. 创建测试项目并生成一张测试图片
+
+注意：API Key 是 ai-router 的密钥，支持多种模型。
 ```
+
+## 支持的模型
+
+- gemini-3-pro-image-preview: Google Gemini 3 Pro 图像预览模型（生成）
+- gemini-2.0-flash-exp: Google Gemini 2.0 Flash 实验模型（分析）
+- 其他支持图像生成的模型
 
 ## 作者
 
