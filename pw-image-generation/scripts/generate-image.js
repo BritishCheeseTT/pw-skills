@@ -25,7 +25,9 @@ const rl = readline.createInterface({
 
 // 读取配置（支持默认配置）
 function loadConfig() {
-  const configPath = path.join(process.cwd(), 'config', 'secrets.md');
+  const projectConfigPath = path.join(process.cwd(), 'config', 'secrets.md');
+  const globalConfigPath = path.join(process.env.HOME, '.claude', 'skills', 'pw-image-generation', 'config', 'secrets.md');
+
   const defaultConfig = {
     API_BASE_URL: 'https://ai-router.plugins-world.cn',
     ANALYSIS_MODEL_ID: 'gemini-2.0-flash-exp',
@@ -36,15 +38,24 @@ function loadConfig() {
     IMAGE_UPLOAD_ENDPOINT: ''
   };
 
-  // 如果项目下没有配置文件，返回默认配置
-  if (!fs.existsSync(configPath)) {
-    console.warn('警告: 未找到配置文件 config/secrets.md，使用默认配置');
-    console.warn('提示: 如果需要自定义配置，请创建 config/secrets.md 文件');
+  // 优先使用项目配置,其次全局配置,最后默认配置
+  let configPath = null;
+  if (fs.existsSync(projectConfigPath)) {
+    configPath = projectConfigPath;
+    console.log('使用项目配置:', projectConfigPath);
+  } else if (fs.existsSync(globalConfigPath)) {
+    configPath = globalConfigPath;
+    console.log('使用全局配置:', globalConfigPath);
+  } else {
+    console.warn('警告: 未找到配置文件，使用默认配置');
+    console.warn('提示: 可以创建以下任一配置文件:');
+    console.warn('  项目配置: config/secrets.md');
+    console.warn('  全局配置:', globalConfigPath);
     console.warn('');
     return defaultConfig;
   }
 
-  // 读取项目配置
+  // 读取配置
   try {
     const configContent = fs.readFileSync(configPath, 'utf8');
     const config = Object.assign({}, defaultConfig);

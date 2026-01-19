@@ -47,17 +47,22 @@ for i in "${!PROMPT_FILES[@]}"; do
   case "$answer" in
     y|Y)
       echo "生成中..."
-      # 临时创建只包含当前文件的目录
+      # 临时创建目录结构
       TEMP_DIR=$(mktemp -d)
-      cp "$FILE" "$TEMP_DIR/"
+      mkdir -p "$TEMP_DIR/prompts"
+      cp "$FILE" "$TEMP_DIR/prompts/"
 
-      # 调用生成脚本
-      echo "y" | node ~/.claude/skills/pw-image-generation/scripts/generate-image.js "$TEMP_DIR" 2>&1 | grep -E "(生成|成功|失败|错误)" || echo "生成完成"
+      # 调用生成脚本 (输出目录是 TEMP_DIR)
+      (cd "$TEMP_DIR" && echo "y" | node ~/.claude/skills/pw-image-generation/scripts/generate-image.js . 2>&1) | grep -E "(生成|成功|失败|错误|保存)" || true
 
-      # 移动生成的图片到目标目录
-      if [ -f "$TEMP_DIR/$(basename "$FILE" .md).png" ]; then
-        mv "$TEMP_DIR/$(basename "$FILE" .md).png" "$IMAGES_DIR/"
-        echo "✓ 已生成: $IMAGES_DIR/$(basename "$FILE" .md).png"
+      # 查找生成的图片
+      GENERATED_IMAGE=$(find "$TEMP_DIR" -name "*.png" -type f | head -1)
+
+      if [ -n "$GENERATED_IMAGE" ]; then
+        # 使用原始文件名
+        OUTPUT_NAME="$(basename "$FILE" .md).png"
+        mv "$GENERATED_IMAGE" "$IMAGES_DIR/$OUTPUT_NAME"
+        echo "✓ 已生成: $IMAGES_DIR/$OUTPUT_NAME"
       else
         echo "✗ 生成失败"
       fi
