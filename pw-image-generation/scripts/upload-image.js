@@ -47,6 +47,70 @@ function saveHistory(history) {
 // 上传到 freeimage.host
 console.log(`正在上传: ${imagePath}`);
 
+/**
+ * API 响应数据结构:
+ * {
+ *   status_code: 200,
+ *   success: { message: 'image uploaded', code: 200 },
+ *   image: {
+ *     name: 'example-image',
+ *     extension: 'png',
+ *     width: 4001,
+ *     height: 2251,
+ *     size: 2841851,
+ *     time: 1768822789,
+ *     expiration: 0,
+ *     likes: 0,
+ *     description: null,
+ *     original_filename: 'example-image.png',
+ *     is_animated: 0,
+ *     id_encoded: 'xxxxx',
+ *     extension_name: 'png',
+ *     size_formatted: '2.8 MB',
+ *     filename: 'xxxxx.png',
+ *     url: 'https://iili.io/xxxxx.png',
+ *     url_short: 'https://freeimage.host/i/xxxxx',
+ *     url_seo: 'https://freeimage.host/i/example-image.xxxxx',
+ *     url_viewer: 'https://freeimage.host/i/xxxxx',
+ *     url_viewer_preview: 'https://freeimage.host/i/xxxxx',
+ *     url_viewer_thumb: 'https://freeimage.host/i/xxxxx',
+ *     image: {
+ *       filename: 'xxxxx.png',
+ *       name: 'xxxxx',
+ *       mime: 'image/png',
+ *       extension: 'png',
+ *       url: 'https://iili.io/xxxxx.png',
+ *       size: 2841851
+ *     },
+ *     thumb: {
+ *       filename: 'xxxxx.th.png',
+ *       name: 'xxxxx.th',
+ *       mime: 'image/png',
+ *       extension: 'png',
+ *       url: 'https://iili.io/xxxxx.th.png'
+ *     },
+ *     medium: {
+ *       filename: 'xxxxx.md.png',
+ *       name: 'xxxxx.md',
+ *       mime: 'image/png',
+ *       extension: 'png',
+ *       url: 'https://iili.io/xxxxx.md.png'
+ *     },
+ *     display_url: 'https://iili.io/xxxxx.md.png',
+ *     display_width: 4001,
+ *     display_height: 2251,
+ *     views_label: 'views',
+ *     likes_label: 'likes',
+ *     how_long_ago: '7 minutes ago',
+ *     date_fixed_peer: '2026-01-19 11:39:49',
+ *     title: 'example-image',
+ *     title_truncated: 'example-image',
+ *     title_truncated_html: 'example-image',
+ *     is_use_loader: false
+ *   },
+ *   status_txt: 'OK'
+ * }
+ */
 try {
   const cmd = `curl -s -X POST -F "source=@${imagePath}" "https://freeimage.host/api/1/upload?key=6d207e02198a847aa98d0a2a901485a5"`;
   const result = execSync(cmd, { encoding: 'utf-8' });
@@ -55,8 +119,9 @@ try {
 
   if (json.status_code === 200 && json.image && json.image.url) {
     const url = json.image.url;
-    const deleteUrl = json.image.delete_url || null;
+    const deleteUrl = json.image.url_viewer || null;
 
+    console.log("json", json);
     console.log(`\n✅ 上传成功: ${url}`);
     console.log(`\n可以在提示词中使用:\n${url} 参考这张图片...`);
 
