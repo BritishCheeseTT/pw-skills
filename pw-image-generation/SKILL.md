@@ -1,5 +1,5 @@
 ---
-name: pw-image-gen
+name: pw-image-generation
 description: AI 图像生成工作流。支持文生图、图生图、批量生成、图床上传/删除、合并长图、生成 PPT。
 ---
 
