@@ -272,6 +272,19 @@ async function main() {
 
     console.log(`  找到 ${prompts.length} 个提示词文件\n`);
 
+    // 询问生成模式
+    console.log('请选择生成模式:');
+    console.log('  1. 逐个确认 (每张图像生成前都会询问)');
+    console.log('  2. 批量生成 (跳过确认，直接生成所有图像)');
+    const modeChoice = await askUser('请输入选项 (1/2, 默认: 1): ');
+    const batchMode = modeChoice === '2';
+
+    if (batchMode) {
+      console.log('\n【批量模式】将自动生成所有图像，跳过已存在的图像\n');
+    } else {
+      console.log('\n【逐个确认模式】每张图像生成前都会询问\n');
+    }
+
     // 生成每张图像
     for (let i = 0; i < prompts.length; i++) {
       const { file, prompt, content } = prompts[i];
@@ -289,6 +302,10 @@ async function main() {
 
       if (fs.existsSync(imagePath)) {
         console.log(`图像已存在: ${imageFileName}`);
+        if (batchMode) {
+          console.log('批量模式: 自动跳过\n');
+          continue;
+        }
         const skip = await askUser('是否跳过已生成的图像? (y/n, 默认: y): ');
         if (skip !== 'n') {
           console.log('跳过\n');
@@ -297,11 +314,13 @@ async function main() {
       }
 
       // 用户确认（重点：避免额度浪费）
-      console.log('【重要提示】生成将消耗 API 额度');
-      const confirm = await askUser('是否生成此图像? (y/n, 默认: y): ');
-      if (confirm === 'n') {
-        console.log('跳过\n');
-        continue;
+      if (!batchMode) {
+        console.log('【重要提示】生成将消耗 API 额度');
+        const confirm = await askUser('是否生成此图像? (y/n, 默认: y): ');
+        if (confirm === 'n') {
+          console.log('跳过\n');
+          continue;
+        }
       }
 
       // 检查是否有参考图像

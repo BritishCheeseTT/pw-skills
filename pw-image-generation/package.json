@@ -6,10 +6,12 @@
   "scripts": {
     "generate": "node scripts/generate-image.js",
     "merge": "node scripts/merge-images.js",
-    "pptx": "node scripts/images2pptx.js"
+    "pptx": "node scripts/merge-to-pptx.js",
+    "pdf": "node scripts/merge-to-pdf.js"
   },
   "dependencies": {
     "node-fetch": "^3.3.2",
+    "pdf-lib": "^1.17.1",
     "pptxgenjs": "^3.12.0"
   }
 }
