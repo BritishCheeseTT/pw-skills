@@ -225,11 +225,48 @@ async function fetch_google_cookies_via_cdp(
         const currentHash = `${m['__Secure-1PSID']}:${m['__Secure-1PSIDTS']}`;
 
         if (lastCookieHash === '') {
-          // First time detecting cookies
+          // First time detecting cookies, verify they are valid
           lastCookieHash = currentHash;
           cookieDetectedCount = 1;
           if (verbose) {
-            logger.info('Cookies detected. Waiting to confirm they are fresh...');
+            logger.info('Cookies detected. Verifying login status...');
+          }
+
+          // Check if user is actually logged in by examining page content
+          try {
+            const pageContent = await cdp.send<{ result: { value: string } }>(
+              'Runtime.evaluate',
+              { expression: 'document.body.innerHTML' },
+              { sessionId, timeoutMs: 5_000 },
+            );
+
+            const html = pageContent.result.value;
+            // Check for user account indicators (email address or account menu)
+            // Logged in: contains email with @ symbol and account-related elements
+            // Not logged in: contains sign-in related elements
+            const hasEmail = /@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(html);
+            const hasAccountMenu = html.includes('aria-label="Google 账号') || html.includes('aria-label="Google Account');
+            const hasSignInButton = html.includes('ServiceLogin') || html.includes('accounts.google.com/SignOutOptions') === false;
+
+            const isLoggedIn = (hasEmail || hasAccountMenu) && !html.includes('accounts.google.com/ServiceLogin');
+
+            if (isLoggedIn) {
+              if (verbose) {
+                logger.success('Login verified! Authentication successful! Browser will close in 3 seconds...');
+              }
+              await sleep(3000);
+              return m;
+            } else {
+              if (verbose) {
+                logger.warning('Detected cookies are from a logged-out session. Please log in in the browser.');
+              }
+              lastCookieHash = '';
+              cookieDetectedCount = 0;
+            }
+          } catch (e) {
+            if (verbose) {
+              logger.debug(`Failed to verify login status: ${e instanceof Error ? e.message : String(e)}`);
+            }
           }
         } else if (currentHash !== lastCookieHash) {
           // Cookies changed, user just logged in
@@ -242,7 +279,7 @@ async function fetch_google_cookies_via_cdp(
           // Same cookies, increment counter
           cookieDetectedCount++;
 
-          // After detecting the same cookies 3 times (6 seconds), assume they are valid
+          // After detecting the same cookies 3 times (6 seconds), verify and return
           if (cookieDetectedCount >= 3) {
             if (verbose) {
               logger.success('Cookies confirmed. Authentication successful! Browser will close in 3 seconds...');
