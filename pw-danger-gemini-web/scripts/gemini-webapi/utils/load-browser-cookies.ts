@@ -1,8 +1,8 @@
+import { spawn, type ChildProcess } from 'node:child_process';
 import fs from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import net from 'node:net';
 import process from 'node:process';
-import { spawn, type ChildProcess } from 'node:child_process';
 
 import { logger } from './logger.js';
 import { fetch_with_timeout, sleep } from './http.js';
@@ -147,21 +147,31 @@ function find_chrome_executable(): string | null {
   return null;
 }
 
-async function wait_for_chrome_debug_port(port: number, timeoutMs: number): Promise<string> {
+async function wait_for_chrome_debug_port(port: number, timeoutMs: number, verbose: boolean): Promise<string> {
   const start = Date.now();
+  let attempt = 0;
   while (Date.now() - start < timeoutMs) {
     try {
       const res = await fetch_with_timeout(`http://127.0.0.1:${port}/json/version`, { timeout_ms: 5_000 });
       if (!res.ok) throw new Error(`status=${res.status}`);
       const j = (await res.json()) as { webSocketDebuggerUrl?: string };
-      if (j.webSocketDebuggerUrl) return j.webSocketDebuggerUrl;
-    } catch {}
+      if (j.webSocketDebuggerUrl) {
+        if (verbose) logger.debug(`Chrome debug port ready on port ${port}`);
+        return j.webSocketDebuggerUrl;
+      }
+    } catch (e) {
+      attempt++;
+      if (verbose && attempt % 10 === 0) {
+        const elapsed = Math.floor((Date.now() - start) / 1000);
+        logger.debug(`Still waiting for Chrome to start... (${elapsed}s elapsed, attempt ${attempt})`);
+      }
+    }
     await sleep(200);
   }
   throw new Error('Chrome debug port not ready');
 }
 
-async function launch_chrome(profileDir: string, port: number): Promise<ChildProcess> {
+async function launch_chrome(profileDir: string, port: number, verbose: boolean): Promise<ChildProcess> {
   const chrome = find_chrome_executable();
   if (!chrome) throw new Error('Chrome executable not found.');
 
@@ -174,7 +184,45 @@ async function launch_chrome(profileDir: string, port: number): Promise<ChildPro
     'https://gemini.google.com/app',
   ];
 
+  if (verbose) {
+    logger.debug(`Chrome executable: ${chrome}`);
+    logger.debug(`Chrome args: ${args.join(' ')}`);
+  }
+
   return spawn(chrome, args, { stdio: 'ignore' });
+}
+
+async function verify_login_status_via_html(
+  cdp: CdpConnection,
+  sessionId: string,
+  verbose: boolean,
+): Promise<boolean> {
+  try {
+    const pageContent = await cdp.send<{ result: { value: string } }>(
+      'Runtime.evaluate',
+      { expression: 'document.body.innerHTML' },
+      { sessionId, timeoutMs: 5_000 },
+    );
+
+    const html = pageContent.result.value;
+    // Check for user account indicators (email address or account menu)
+    // Logged in: contains email with @ symbol and account-related elements
+    // Not logged in: contains sign-in related elements
+    const hasEmail = /@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(html);
+    const hasAccountMenu = html.includes('aria-label="Google 账号') || html.includes('aria-label="Google Account');
+    const isLoggedIn = (hasEmail || hasAccountMenu) && !html.includes('accounts.google.com/ServiceLogin');
+
+    if (verbose && !isLoggedIn) {
+      logger.debug('HTML check: User not logged in or session expired');
+    }
+
+    return isLoggedIn;
+  } catch (e) {
+    if (verbose) {
+      logger.debug(`Failed to verify login status via HTML: ${e instanceof Error ? e.message : String(e)}`);
+    }
+    return false;
+  }
 }
 
 async function fetch_google_cookies_via_cdp(
@@ -184,11 +232,16 @@ async function fetch_google_cookies_via_cdp(
   await mkdir(profileDir, { recursive: true });
 
   const port = await get_free_port();
-  const chrome = await launch_chrome(profileDir, port);
+  if (verbose) {
+    logger.debug(`Launching Chrome with debug port ${port}`);
+    logger.debug(`Profile directory: ${profileDir}`);
+  }
+
+  const chrome = await launch_chrome(profileDir, port, verbose);
 
   let cdp: CdpConnection | null = null;
   try {
-    const wsUrl = await wait_for_chrome_debug_port(port, 30_000);
+    const wsUrl = await wait_for_chrome_debug_port(port, 60_000, verbose);
     cdp = await CdpConnection.connect(wsUrl, 15_000);
 
     const { targetId } = await cdp.send<{ targetId: string }>('Target.createTarget', {
@@ -233,40 +286,20 @@ async function fetch_google_cookies_via_cdp(
           }
 
           // Check if user is actually logged in by examining page content
-          try {
-            const pageContent = await cdp.send<{ result: { value: string } }>(
-              'Runtime.evaluate',
-              { expression: 'document.body.innerHTML' },
-              { sessionId, timeoutMs: 5_000 },
-            );
+          const isLoggedIn = await verify_login_status_via_html(cdp, sessionId, verbose);
 
-            const html = pageContent.result.value;
-            // Check for user account indicators (email address or account menu)
-            // Logged in: contains email with @ symbol and account-related elements
-            // Not logged in: contains sign-in related elements
-            const hasEmail = /@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(html);
-            const hasAccountMenu = html.includes('aria-label="Google 账号') || html.includes('aria-label="Google Account');
-            const hasSignInButton = html.includes('ServiceLogin') || html.includes('accounts.google.com/SignOutOptions') === false;
-
-            const isLoggedIn = (hasEmail || hasAccountMenu) && !html.includes('accounts.google.com/ServiceLogin');
-
-            if (isLoggedIn) {
-              if (verbose) {
-                logger.success('Login verified! Authentication successful! Browser will close in 3 seconds...');
-              }
-              await sleep(3000);
-              return m;
-            } else {
-              if (verbose) {
-                logger.warning('Detected cookies are from a logged-out session. Please log in in the browser.');
-              }
-              lastCookieHash = '';
-              cookieDetectedCount = 0;
-            }
-          } catch (e) {
+          if (isLoggedIn) {
             if (verbose) {
-              logger.debug(`Failed to verify login status: ${e instanceof Error ? e.message : String(e)}`);
+              logger.success('Login verified! Authentication successful! Browser will close in 3 seconds...');
             }
+            await sleep(3000);
+            return m;
+          } else {
+            if (verbose) {
+              logger.warning('Detected cookies are from a logged-out session. Please log in in the browser.');
+            }
+            lastCookieHash = '';
+            cookieDetectedCount = 0;
           }
         } else if (currentHash !== lastCookieHash) {
           // Cookies changed, user just logged in

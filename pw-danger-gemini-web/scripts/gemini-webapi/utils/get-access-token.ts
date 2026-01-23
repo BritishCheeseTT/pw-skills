@@ -85,7 +85,6 @@ export async function get_access_token(
 
   const cacheDir = resolveGeminiWebDataDir();
   const candidates: Record<string, string>[] = [];
-  let chromeAttempted = false;
 
   const cookieFilePath = resolveGeminiWebCookiePath();
   const cachedFile = await read_cookie_file(cookieFilePath);
@@ -93,7 +92,6 @@ export async function get_access_token(
   const shouldUseChromeFirst = forceLogin || (!cachedFile && !base_cookies['__Secure-1PSID'] && !base_cookies['__Secure-1PSIDTS']);
 
   if (shouldUseChromeFirst) {
-    chromeAttempted = true;
     try {
       const browser = await load_browser_cookies('google.com', verbose);
       for (const cookies of Object.values(browser)) {
@@ -161,12 +159,6 @@ export async function get_access_token(
     return [token, cookies];
   } catch {
     if (verbose) logger.debug('Cookie attempts failed. Falling back to Chrome CDP cookie load...');
-  }
-
-  if (chromeAttempted) {
-    throw new AuthError(
-      'Failed to initialize client. Chrome CDP was already attempted but failed to provide valid cookies.',
-    );
   }
 
   const browser = await load_browser_cookies('google.com', verbose);
